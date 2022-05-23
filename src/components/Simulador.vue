@@ -14,7 +14,7 @@
                     <b-form-input v-model="Puerto" class="mr-sm-2 mb-sm-0 font-weight-bold"></b-form-input>
                     <div class="row align-items-center">
                         <button class="btn-lg  badge-pill TestigoWebSocket Conectado" v-if="WebSocketConectado">CONECTADO</button>
-                        <button class="btn-lg  badge-pill TestigoWebSocket Conectar" v-if="!WebSocketConectado" @click="ConectarWebSocket()">CONECTAR</button>
+                        <button class="btn-lg  badge-pill TestigoWebSocket Conectar" v-if="!WebSocketConectado" @click="ReconectarWS">CONECTAR</button>
                     </div>
                 </b-form>
             </div>
@@ -124,6 +124,9 @@
 
                 this.ACTUALIZAR_TABLA_MENSAJES(MensajeFormado);
             },
+            ReconectarWS() {
+                this.ConectarWebSocket();
+            }
         },
         /***************************************************************************
         * FUNCIÓN: created()

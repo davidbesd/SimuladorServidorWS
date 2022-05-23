@@ -161,21 +161,6 @@ export default new Vuex.Store({
                 const MensajeTx = JSON.stringify(Mensaje);
                 console.log("%c [SIMULADOR] >>>> Envía por Socket: " + MensajeTx, "color:green");
                 this.state.ObjWebSocket.send(MensajeTx);
-                // console.log("En EnviarMensajeDTR(...)");
-                // console.log("   Mensaje.Tipo:    " + Mensaje.Tipo);
-                // console.log("   Mensaje.Mensaje: " + Mensaje.Mensaje);
-                // this.state.ObjWebSocket.send(
-                //     JSON.stringify({
-                //     Tipo: Mensaje.Tipo,
-                //     Mensaje: Mensaje.Mensaje
-                //     })
-                // );
-                
-                // console.log("------------------------------------------");
-                // console.log("[WS] Tx ===================================> Cliente: " + this.state.NombreClienteWS);
-                // console.log("[WS] Tx ===================================> Tipo:    " + Mensaje.Tipo);
-                // console.log("[WS] Tx ===================================> Mensaje: " + Mensaje.Mensaje);
-                // console.log("------------------------------------------");
         },
         // Acciones sobre las que se hace dispatch para ejecutar funciones de otros componentes.
         MensajeWebSocket(Mensaje) {},

@@ -11,7 +11,7 @@
     // import Simulador from '../components/Simulador.vue';
 
     export default {
-        name: "Home",
+        name: "v_Simulador",
         components: {
             Simulador
         },
