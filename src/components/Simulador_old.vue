@@ -25,21 +25,13 @@
         </div>
         <!--  ********************************************************************************************************  -->
         <div class="row align-items-start">
-            <b-form-group>
-                <b-form-radio-group
-                    id="OpcionesMensaje"
-                    v-model="selected"
-                    :options="ArrayOpcionesDeMensaje"
-                    v-on:change="ValidarTipo"
-                    name-field="text"
-                    value-field="value"
-                    name="some-radios"
-                    class="Elemento mr-sm-2 mb-sm-0 font-weight-bold">
-                </b-form-radio-group>
-            </b-form-group>
-
-<!--                     value-field="item"
-                    text-field="name" -->
+            <b-form-radio-group
+                v-model="TipoSeleccionado"
+                :options="TiposDeMensaje"
+                class="Elemento mr-sm-2 mb-sm-0 font-weight-bold"
+                value-field="item"
+                text-field="name">
+            </b-form-radio-group>
         </div>
         <!--  ********************************************************************************************************  -->
         <div class="row align-items-start mr-sm-2 mb-sm-0">
@@ -48,7 +40,8 @@
         <!--  ********************************************************************************************************  -->
         <div class="row align-items-start mr-sm-2 mb-sm-0">
             <div class="col-lg-8 d-flex justify-content-start">
-                <b-form-input  v-model="MensajeAEnviar" :state="ValidarMensaje" class="Enviar mr-sm-2 mb-sm-0" placeholder="Mensaje a enviar..."></b-form-input>
+                <b-form-input  v-model="MensajeAEnviar" :state="Validacion" class="Enviar mr-sm-2 mb-sm-0" placeholder="Mensaje a envíar"></b-form-input>
+                <!-- <b-button class="font-weight-bold" size="sm" pill variant="primary" :disabled="!EnvioPermitido" @click="EnviarMensaje">ENVIAR</b-button>         -->
                 <b-button class="font-weight-bold" size="sm" pill variant="primary" :disabled="!ValidacionEnvio()" @click="EnviarMensaje">ENVIAR</b-button>        
             </div>
         </div>
@@ -65,11 +58,7 @@
                 :items='ArrayMensajes' 
                 class="text-left EstiloTabla TablaRx">
             </b-table>
-        </div>
-        <!--  ********************************************************************************************************  -->        
-        <div class="row align-items-start mr-sm-2 mb-sm-0">
-            <b-button class="Elemento font-weight-bold" size="sm" pill variant="primary" @click="BorrarMensajes">BORRAR MENSAJES</b-button>
-        </div>
+        </div>        
     </div>
 </template>
 
@@ -82,19 +71,15 @@
             return {
                 IPServidor: "192.168.0.214",
                 Puerto: "4444",
-                TipoMensajeSeleccioa: "",
-                selected: "",
-                ArrayOpcionesDeMensaje: [
-                    {   
-                        name: 'LOG', 
-                        text: 'Registro Eventos', 
-                        value: '{"Tipo":"LOG","Mensaje":"Mensaje de prueba para el componente que muestra el registro de eventos."}'
-                    },
-                    { 
-                        name: 'REARMABLES', 
-                        text: 'Fibras a Rearmar', 
-                        value: '{"Tipo":"REARMABLES","Mensaje":{"NombreFibra":"nueva_FIBRA_4","Valor":"1"}}'
-                    }
+                Mensaje: {
+                    Texto: "",
+                    Estilo: "LOG"
+                },
+                // Para los RadioButton
+                TipoSeleccionado: "LOG",
+                TiposDeMensaje: [
+                    { item: 'LOG', name: 'Registro Eventos' },
+                    { item: 'FIBRAS', name: 'Fibras a Rearmar' },
                 ],
                 EnvioPermitido: false,
                 MensajeAEnviar: "",
@@ -104,41 +89,24 @@
         },
         computed: {
             ...mapState([ "WebSocketConectado", "ArrayMensajes" ]),
-            ValidarMensaje() {
-                // console.log("**** ValidarMensaje ****: " + this.MensajeAEnviar);
+            Validacion() {
                 if(this.MensajeAEnviar.length > 0) {
                     this.EnvioPermitido = true;
                 }
                 else {
                     this.EnvioPermitido = false;
                 }
-            },
+            }
         },
         methods: {
             ...mapActions(["ConectarWebSocket", "EnviarWebSocket"]),
             ...mapMutations(["ACTUALIZA_ESTADO_WS", "ACTUALIZAR_TIEMPO", "ACTUALIZAR_TABLA_MENSAJES"]),
-
-            /***************************************************************************
-            * FUNCIÓN: ValidarTipo()
-            * AUTOR: David Blázquez.
-            * DESCRIPCIÓN: Pasa el valor del checkbutton seleccionado a la variable que
-            *              controla el campo mensaje a enviar.
-            * PARÁMETROS DE ENTRADA: Campo value del objeto seleccionado.
-            * PARÁMETROS DE SALIDA: Ninguno.
-            * FECHA: 26.05.2022
-            ****************************************************************************/
-            ValidarTipo(value) {
-                this.MensajeAEnviar = value;
+            ArrancarSocket() {
+                this.ACTUALIZA_ESTADO_WS(true);
             },
-            /***************************************************************************
-            * FUNCIÓN: ValidacionEnvio()
-            * AUTOR: David Blázquez.
-            * DESCRIPCIÓN: Comprueba si el envío está permitido y si existe conexión con 
-            *              el Servidor de WS para habilitar o no el boón de envío.
-            * PARÁMETROS DE ENTRADA: Ninguno.
-            * PARÁMETROS DE SALIDA: Ninguno.
-            * FECHA: 26.05.2022
-            ****************************************************************************/
+            PararSocket() {
+                this.ACTUALIZA_ESTADO_WS(false);
+            },
             ValidacionEnvio() {
                 if(this.EnvioPermitido == true && this.WebSocketConectado == true) {
                     return true;
@@ -147,42 +115,14 @@
                     return false;
                 }
             },
-            /***************************************************************************
-            * FUNCIÓN: EnviarMensaje()
-            * AUTOR: David Blázquez.
-            * DESCRIPCIÓN: Llama tanto a la mutación que se encarga de actualizar la tabla
-            *              de mensajes como a la función de envío de mensajes por WS.
-            * PARÁMETROS DE ENTRADA: Ninguno.
-            * PARÁMETROS DE SALIDA: Ninguno.
-            * FECHA: 26.05.2022
-            ****************************************************************************/
             EnviarMensaje() {
-                this.ACTUALIZAR_TABLA_MENSAJES(this.MensajeAEnviar);
-                this.EnviarWebSocket(this.MensajeAEnviar);
+                const MensajeFormado = {"Tipo":this.TipoSeleccionado, "Mensaje":this.MensajeAEnviar};
+                console.log("MensajeFormado: " + JSON.stringify(MensajeFormado));
+                this.EnviarWebSocket(MensajeFormado);
+                this.ACTUALIZAR_TABLA_MENSAJES(MensajeFormado);
             },
-            /***************************************************************************
-            * FUNCIÓN: ReconectarWS()
-            * AUTOR: David Blázquez.
-            * DESCRIPCIÓN: Vuelve a intentar la conexión con el Servidor WebSocket.
-            * PARÁMETROS DE ENTRADA: Ninguno.
-            * PARÁMETROS DE SALIDA: Ninguno.
-            * FECHA: 26.05.2022
-            ****************************************************************************/            
             ReconectarWS() {
                 this.ConectarWebSocket();
-            },
-            /***************************************************************************
-            * FUNCIÓN: BorrarMensajes()
-            * AUTOR: David Blázquez.
-            * DESCRIPCIÓN: Borra todos los mensajes de la tabla.
-            * PARÁMETROS DE ENTRADA: Ninguno.
-            * PARÁMETROS DE SALIDA: Ninguno.
-            * FECHA: 26.05.2022
-            ****************************************************************************/            
-            BorrarMensajes() {
-                this.ACTUALIZAR_TABLA_MENSAJES("LimpiarTabla");
-                
-                //this.ArrayMensajes.splice(0);
             }
         },
         /***************************************************************************
@@ -213,6 +153,18 @@
         mounted() {
             var self = this;
             self.ConectarWebSocket();
+             // Subscripción a las acciones del Socket
+            this.$store.subscribeAction((action, state) => {
+            // console.log("Action Subscrita [Consola " + this.Puesto.Consola + "] = " + action.type);
+            switch (action.type) {
+                case "NuevoMensajeWS":
+                // self.ActualizaMensajeLog(action.payload);
+                this.Mensaje.Texto = action.payload;
+                this.Mensaje.Estilo = "danger";
+                this.ACTUALIZAR_TABLA_MENSAJES(this.Mensaje);
+                break;
+            }
+            });
         }
     };
 </script>

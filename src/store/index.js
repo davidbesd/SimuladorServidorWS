@@ -79,20 +79,27 @@ export default new Vuex.Store({
          * AUTOR: David Blázquez.
          * DESCRIPCIÓN: Mutación que guarda en el array de mensajes websocket los 
          *              datos del mensaje que se quiere mostrar en la tabla de mensajes.
+         *              O borra la tabla si es eso lo que recibe como mensaje.
          * PARÁMETROS DE ENTRADA: Objeto con el mensaje a mostrar y su estilo.
          * PARÁMETROS DE SALIDA: Ninguno.
          * FECHA: 17.05.2022
          ****************************************************************************/
         ACTUALIZAR_TABLA_MENSAJES(state, Mensaje) {
-            // console.log("[SIMULADOR] Recibido en ACTUALIZAR_TABLA_MENSAJES: " + JSON.stringify(Mensaje));
-            this.state.MensajeSimulador.Fecha_Hora = this.state.FeHo.FechaActual + " - " + this.state.FeHo.HoraActual  + "    >>>>>>>>>>";
-            this.state.MensajeSimulador.Mensaje    = Mensaje;
-            this.state.MensajeSimulador._rowVariant= "success";
-            // Para evitar que se guarde en el array la referencia al objeto (lo que hace que se vayan machacando los datos con los últimos introducidos)
-            // se pasa a objeto de JS y se vuelve a pasar a cadena, así se guarda un objeto distinto cada vez.
-            let ObjetoRegistro = JSON.parse(JSON.stringify(this.state.MensajeSimulador));
-            // Se añade el objeto recibido al principio del array para mostrar siempre el más reciente.
-            this.state.ArrayMensajes.unshift(ObjetoRegistro);
+            if(Mensaje == "LimpiarTabla") {
+                console.log("Limpia la tabla de mensajes");
+                this.state.ArrayMensajes.splice(0);
+            }
+            else {
+                // console.log("[SIMULADOR] Recibido en ACTUALIZAR_TABLA_MENSAJES: " + JSON.stringify(Mensaje));
+                this.state.MensajeSimulador.Fecha_Hora = this.state.FeHo.FechaActual + " - " + this.state.FeHo.HoraActual  + "    >>>>>>>>>>";
+                this.state.MensajeSimulador.Mensaje    = Mensaje;
+                this.state.MensajeSimulador._rowVariant= "success";
+                // Para evitar que se guarde en el array la referencia al objeto (lo que hace que se vayan machacando los datos con los últimos introducidos)
+                // se pasa a objeto de JS y se vuelve a pasar a cadena, así se guarda un objeto distinto cada vez.
+                let ObjetoRegistro = JSON.parse(JSON.stringify(this.state.MensajeSimulador));
+                // Se añade el objeto recibido al principio del array para mostrar siempre el más reciente.
+                this.state.ArrayMensajes.unshift(ObjetoRegistro);
+            }
         },
     },
     actions: {
@@ -154,7 +161,6 @@ export default new Vuex.Store({
                 // commit('ACTUALIZAR_ESTADO_SOCKET', {TipoSCK:'DTR', Estado:false});
                 this.state.ObjWebSocket         = null;
                 this.state.WebSocketConectado   = false;
-                
             };
         },
         EnviarWebSocket(state, Mensaje) {
@@ -163,9 +169,8 @@ export default new Vuex.Store({
                 this.state.ObjWebSocket.send(MensajeTx);
         },
         // Acciones sobre las que se hace dispatch para ejecutar funciones de otros componentes.
-        MensajeWebSocket(Mensaje) {},
-        // SocketPresentaciones(Mensaje) {}
-        NuevoMensajeSimulador(Mensaje) {}
+        // MensajeWebSocket(Mensaje) {},
+        // NuevoMensajeSimulador(Mensaje) {}
     },
     modules: {}    
 });
