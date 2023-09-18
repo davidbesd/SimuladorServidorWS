@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "SimuladorServidorWS/precache-manifest.f930d0f9adfde98935049df61b5657cb.js"
+  "/SimuladorServidorWS/precache-manifest.21084139557a5c5d59957b363750e9bd.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "simuladorservidorws"});
