@@ -3,7 +3,7 @@
         <div class="row align-items-start">
             <h1 class="Titulo font-weight-bold">Simulador Servidor WebSocket</h1>
         </div>
-        <!--  ********************************************************************************************************  -->
+        <!--  **** CAJAS DATOS SERVIDOR ****************************************************************************************************  -->
         <div class="row align-items-start">
             <div class="Elemento">
                 <b-form inline>
@@ -20,32 +20,61 @@
             </div>
         </div>
         <!--  ********************************************************************************************************  -->
-        <div class="row align-items-start mr-sm-2 mb-sm-0">
-            <label class="Elemento mr-sm-2 mb-sm-0 font-weight-bold">Tipo de mensaje:</label>
-        </div>
-        <!--  ********************************************************************************************************  -->
         <div class="row align-items-start">
-            <b-form-group>
+            <label class="Elemento font-weight-bold">Tipos de mensaje:</label>
+        </div>
+        <!--  **** BOTONES TIPOS DE MENSAJE ****************************************************************************************************  -->
+        <div class="row">
+            <b-form-group class="Opciones">
                 <b-form-radio-group
-                    id="OpcionesMensaje"
-                    v-model="selected"
-                    :options="ArrayOpcionesDeMensaje"
-                    v-on:change="ValidarTipo"
-                    name-field="text"
-                    value-field="value"
-                    name="some-radios"
-                    class="Elemento mr-sm-2 mb-sm-0 font-weight-bold">
+                    v-model="SeleccionTipoMensaje"
+                    :options="ArrayTiposMensaje"                        
+                    v-on:change="ValidarTipoMensaje"
+                    button-variant="outline-primary"
+                    size="md"
+                    buttons
+                >
                 </b-form-radio-group>
             </b-form-group>
-
-<!--                     value-field="item"
-                    text-field="name" -->
         </div>
-        <!--  ********************************************************************************************************  -->
-        <div class="row align-items-start mr-sm-2 mb-sm-0">
-            <label class="Elemento mr-sm-2 mb-sm-0 font-weight-bold">Mensaje a enviar:</label>
+        <!--  **** SELECTORES DE ZONA Y ESTADO ****************************************************************************************************  -->
+        <div class="row">
+            <div class="ListadoZonas d-flex justify-content-start">
+                <b-form-group class="justify-content-end">
+                    <b-form-checkbox-group
+                        v-if='MostrarZonasNavegador'
+                        v-model="SeleccionZona"
+                        :options="ArrayZonasNavegador"    
+                        switches
+                        size="md"
+                        stacked
+                        buttons
+                        button-variant="outline-primary"
+                        v-on:change="ValidarListaZonas"
+                    >
+                    </b-form-checkbox-group>
+                </b-form-group>
+            </div>
+            <div class="ListadoEstados d-flex justify-content-start">
+                <b-form-group>
+                    <b-form-radio-group
+                        v-if='MostrarZonasNavegador'
+                        v-model="SeleccionEstado"
+                        :options="ArrayEstadosZonas"    
+                        size="md"
+                        stacked
+                        buttons
+                        button-variant="outline-primary"
+                        v-on:change="ValidarListaEstados"
+                    >                
+                    </b-form-radio-group>
+                </b-form-group>
+            </div> 
+            <div>
+                <b-button v-if='MostrarZonasNavegador' class="BotonAceptarZonas font-weight-bold" size="sm" pill variant="primary" :disabled="!ValidarMensajeNavegador()" @click="AceptarEstadosNavegador">ACEPTAR</b-button>        
+            </div>
         </div>
-        <!--  ********************************************************************************************************  -->
+        <!--  **** CAJA DE MENSAJE A ENVIAR ****************************************************************************************************  -->        
         <div class="row align-items-start mr-sm-2 mb-sm-0">
             <div class="col-lg-8 d-flex justify-content-start">
                 <b-form-input  v-model="MensajeAEnviar" :state="ValidarMensaje" class="Enviar mr-sm-2 mb-sm-0" placeholder="Mensaje a enviar..."></b-form-input>
@@ -83,21 +112,33 @@
                 IPServidor: "192.168.0.214",
                 Puerto: "4444",
                 TipoMensajeSeleccioa: "",
-                selected: "",
-                ArrayOpcionesDeMensaje: [
-                    {   
-                        name: 'LOG', 
-                        text: 'Registro Eventos', 
-                        value: '{"Tipo":"LOG","Mensaje":"Mensaje de prueba para el componente que muestra el registro de eventos."}'
-                    },
-                    { 
-                        name: 'REARMABLES', 
-                        text: 'Fibras a Rearmar', 
-                        value: '{"Tipo":"REARMABLES","Mensaje":{"NombreFibra":"nueva_FIBRA_4","Valor":"1"}}'
-                    }
-                ],
+                SeleccionTipoMensaje: null,
+                MostrarZonasNavegador: false,
                 EnvioPermitido: false,
                 MensajeAEnviar: "",
+                SeleccionZona: [],
+                SeleccionEstado: "",
+                ArrayTiposMensaje: [
+                    { name: 'LOG', text: 'Registro Eventos', value: '{"Tipo":"LOG","Mensaje":"Mensaje de prueba para el componente que muestra el registro de eventos."}' },
+                    { name: 'REARMABLES', text: 'Fibras a Rearmar', value: '{"Tipo":"REARMABLES","Mensaje":{"NombreFibra":"nueva_FIBRA_4","Valor":"1"}}' },
+                    { name: 'ESTADOS_PASO', text: 'Estado Pasos', value: '{"Tipo":"PASO","Mensaje":{"ENCE":"1","GW":"1","ET":"101","IP_PASO":"10103","NOMBRE":"PS 80,7","OFF":"0","PREV":"1","MANT":"2", "ESTADO":"8"}}' },
+                    { name: 'CABECERA_ENC', text: 'Cabecera ENC', value: '{"Tipo":"GW","Mensaje":{"GW":"8","ET":"0","COM":"0","ALARMA":"15","PPAL":"0","ALT":"0","EST_PPAL":"0","EST_ALT":"0"}}' },
+                    { name: 'NAV', text: 'Zonas Navegador', value: 'NAVEGADOR' }
+                ],
+                ArrayZonasNavegador: [
+                    { name: 'PLASENCIA', text: 'Plasencia', value: 'BTZ1' },
+                    { name: 'CÁCERES', text: 'Cáceres', value: 'BTZ2' },
+                    { name: 'MÉRIDA', text: 'Mérida', value: 'BTZ3' },
+                    { name: 'GUADIANA', text: 'Guadiana', value: 'BTZ4' },
+                    { name: 'BADAJOZ', text: 'Badajoz', value: 'BTZ5' }
+                ],
+                ArrayEstadosZonas: [
+                    { text: 'Sin conexión', value: '0', color: '#666666' },
+                    { text: 'Normal', value: '1', color: '#lightgray' },
+                    { text: 'Objeto', value: '2', color: '#FF0000' },
+                    { text: 'Anomalia', value: '3', color: '#FFFF00' },
+                    { text: 'Mantenimiento', value: '4', color: '#00CCFF' }
+                ],
             }
         },
         props: {
@@ -117,9 +158,12 @@
         methods: {
             ...mapActions(["ConectarWebSocket", "EnviarWebSocket"]),
             ...mapMutations(["ACTUALIZA_ESTADO_WS", "ACTUALIZAR_TIEMPO", "ACTUALIZAR_TABLA_MENSAJES"]),
-
+            GetVariant(Color) {
+                console.log('Color: ' + Color);
+                
+            },
             /***************************************************************************
-            * FUNCIÓN: ValidarTipo()
+            * FUNCIÓN: ValidarTipoMensaje()
             * AUTOR: David Blázquez.
             * DESCRIPCIÓN: Pasa el valor del checkbutton seleccionado a la variable que
             *              controla el campo mensaje a enviar.
@@ -127,8 +171,48 @@
             * PARÁMETROS DE SALIDA: Ninguno.
             * FECHA: 26.05.2022
             ****************************************************************************/
-            ValidarTipo(value) {
-                this.MensajeAEnviar = value;
+            ValidarTipoMensaje(value) {
+                if(value == "NAVEGADOR") {
+                    this.MensajeAEnviar = "";
+                    this.MostrarZonasNavegador = true;
+                }
+                else {
+                    this.MostrarZonasNavegador = false;
+                    this.MensajeAEnviar = value;
+                    this.SeleccionZona = [];
+                    this.SeleccionEstado = "";
+                }
+            },
+            ValidarListaZonas() {
+                this.MensajeAEnviar = "";
+            },
+            ValidarMensajeNavegador() {
+                if(this.SeleccionZona != "" && this.SeleccionEstado != "") {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            ValidarListaEstados() {
+                this.MensajeAEnviar = "";
+            },
+            AceptarEstadosNavegador() {
+                console.log('AceptarEstadosNavegador()');
+                console.log('this.SeleccionZona: ' + this.SeleccionZona);
+                console.log('this.SeleccionEstado: ' + this.SeleccionEstado);
+
+                this.MensajeAEnviar = '{"Tipo":"NAV","Mensaje":['; 
+
+                this.SeleccionZona.forEach((Zona, Indice) => {
+                    this.MensajeAEnviar += '{"NombreZona":"' + Zona + '","Estado":"' + this.SeleccionEstado + '"}';
+                    if(Indice < this.SeleccionZona.length-1 ) {
+                        this.MensajeAEnviar += ',';
+                    }
+                });
+                this.MensajeAEnviar += ']}';
+                console.log('this.MensajeAEnviar: ' + this.MensajeAEnviar);
+                
             },
             /***************************************************************************
             * FUNCIÓN: ValidacionEnvio()
@@ -229,6 +313,10 @@
         margin-top: 20px;
         margin-left: 50px;
     }
+
+    .Opciones {
+        margin-left: 50px;
+    }
     
     .Puerto {
         width: 50px;
@@ -272,5 +360,20 @@
         pointer-events: none;
         background-color: greenyellow;
         color: black;
+    }
+
+    .ListadoZonas {
+        /* outline: 4px solid red; */
+        margin-left: 635px;
+    }
+
+    .ListadoEstados {
+        /* outline: 4px solid red; */
+        margin-left: 10px;
+    }
+
+    .BotonAceptarZonas {
+        margin-left: 10px;
+        margin-top: 77px;
     }
 </style>

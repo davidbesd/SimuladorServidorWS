@@ -90,8 +90,9 @@ export default new Vuex.Store({
                 this.state.ArrayMensajes.splice(0);
             }
             else {
-                // console.log("[SIMULADOR] Recibido en ACTUALIZAR_TABLA_MENSAJES: " + JSON.stringify(Mensaje));
-                this.state.MensajeSimulador.Fecha_Hora = this.state.FeHo.FechaActual + " - " + this.state.FeHo.HoraActual  + "    >>>>>>>>>>";
+                console.log("[SIMULADOR] Recibido en ACTUALIZAR_TABLA_MENSAJES: " + JSON.stringify(Mensaje));
+                // this.state.MensajeSimulador.Fecha_Hora = this.state.FeHo.FechaActual + " - " + this.state.FeHo.HoraActual  + "    >>>>>>>>>>";
+                this.state.MensajeSimulador.Fecha_Hora = this.state.FeHo.FechaActual + " - " + this.state.FeHo.HoraActual  + "    -------->>";
                 this.state.MensajeSimulador.Mensaje    = Mensaje;
                 this.state.MensajeSimulador._rowVariant= "success";
                 // Para evitar que se guarde en el array la referencia al objeto (lo que hace que se vayan machacando los datos con los últimos introducidos)
@@ -144,10 +145,14 @@ export default new Vuex.Store({
                 // console.log("this.state.MensajeWebSocket.Mensaje: " + this.state.MensajeWebSocket.Mensaje);
 
                 console.log("%c [SIMULADOR] <<<< Recibido por Socket: " + JSON.stringify(this.state.MensajeWebSocket), "color:red");
+                // "color:#000;font-size: 16px;background:#0f0;font-weight: bold;"
+                
                 // Actualiza la tabla de mensajes de Socket con el recibido del Servidor.
-                this.state.MensajeSimulador.Fecha_Hora = this.state.FeHo.FechaActual + " - " + this.state.FeHo.HoraActual + "    <<<<<<<<<<";
+                // this.state.MensajeSimulador.Fecha_Hora = this.state.FeHo.FechaActual + " - " + this.state.FeHo.HoraActual + "    <<<<<<<<<<";
+                this.state.MensajeSimulador.Fecha_Hora = this.state.FeHo.FechaActual + " - " + this.state.FeHo.HoraActual + "    <<--------";
                 this.state.MensajeSimulador.Mensaje    = JSON.stringify(this.state.MensajeWebSocket);
-                this.state.MensajeSimulador._rowVariant= "danger";
+                this.state.MensajeSimulador._rowVariant= "primary";
+                
                 // Para evitar que se guarde en el array la referencia al objeto (lo que hace que se vayan machacando los datos con los últimos introducidos)
                 // se pasa a objeto de JS y se vuelve a pasar a cadena, así se guarda un objeto distinto cada vez.
                 let ObjetoRegistro = JSON.parse(JSON.stringify(this.state.MensajeSimulador));
@@ -164,9 +169,8 @@ export default new Vuex.Store({
             };
         },
         EnviarWebSocket(state, Mensaje) {
-                const MensajeTx = JSON.stringify(Mensaje);
-                console.log("%c [SIMULADOR] >>>> Envía por Socket: " + MensajeTx, "color:green");
-                this.state.ObjWebSocket.send(MensajeTx);
+                console.log("%c [SIMULADOR] >>>> Envía por Socket: " + Mensaje, "color:green");
+                this.state.ObjWebSocket.send(Mensaje);
         },
         // Acciones sobre las que se hace dispatch para ejecutar funciones de otros componentes.
         // MensajeWebSocket(Mensaje) {},
